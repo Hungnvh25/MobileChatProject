@@ -1,5 +1,6 @@
 package com.example.mychat;
 
+<<<<<<< HEAD
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -30,10 +31,21 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+=======
+import android.os.Bundle;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+>>>>>>> origin/main
 
 public class LoginOtpActivity extends AppCompatActivity {
 
     String phoneNumber;
+<<<<<<< HEAD
     Long timeoutSeconds = 60L;
     String verificationCode;
     PhoneAuthProvider.ForceResendingToken resendingToken;
@@ -122,5 +134,15 @@ public class LoginOtpActivity extends AppCompatActivity {
         setInProgress(true);
 
 
+=======
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_login_otp);
+
+        phoneNumber = getIntent().getExtras().getString("phone");
+        Toast.makeText(getApplicationContext(), phoneNumber, Toast.LENGTH_SHORT).show();
+>>>>>>> origin/main
     }
 }
