@@ -1,9 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
-<<<<<<< HEAD
     id("com.google.gms.google-services")
-=======
->>>>>>> origin/main
 }
 
 android {
@@ -38,7 +35,6 @@ android {
 dependencies {
 
     implementation(libs.appcompat)
-<<<<<<< HEAD
     implementation(libs.google.services)
     implementation(libs.material)
     implementation(libs.activity)
@@ -46,11 +42,6 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
     implementation(platform(libs.firebase.bom))
-=======
-    implementation(libs.material)
-    implementation(libs.activity)
-    implementation(libs.constraintlayout)
->>>>>>> origin/main
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
