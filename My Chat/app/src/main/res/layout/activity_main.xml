@@ -6,12 +6,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+<<<<<<< HEAD
     <RelativeLayout
         android:id="@+id/main_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/my_primary"
         android:padding="10dp">
+=======
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Akinaoa"/>
+
+    </LinearLayout>
+
+>>>>>>> 036e45385f5fb89bfa1476dfbf52cab71cfcc676
 
         <TextView
             android:layout_width="match_parent"

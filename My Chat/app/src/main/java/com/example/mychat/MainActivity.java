@@ -1,13 +1,17 @@
 package com.example.mychat;
 
+
 import android.content.Intent;
+
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+
 import android.view.MenuItem;
 import android.widget.ImageButton;
+
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -58,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
 
     }
 }
