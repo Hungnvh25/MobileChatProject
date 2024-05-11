@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.firestore)
+    implementation((libs.firebaseui))
     implementation(libs.firebase.auth)
     implementation(platform(libs.firebase.bom))
     testImplementation(libs.junit)
