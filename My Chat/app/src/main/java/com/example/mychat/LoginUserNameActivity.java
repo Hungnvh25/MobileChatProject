@@ -61,7 +61,7 @@ public class LoginUserNameActivity extends AppCompatActivity {
         if(user!=null){
             user.setUserName(userName);
         }else {
-            user = new User(phoneNumber,userName, Timestamp.now());
+            user = new User(phoneNumber,userName, Timestamp.now(),FirebaseUtil.currentUserId());
         }
 
         FirebaseUtil.currentUserDetails().set(user).addOnCompleteListener(new OnCompleteListener<Void>() {

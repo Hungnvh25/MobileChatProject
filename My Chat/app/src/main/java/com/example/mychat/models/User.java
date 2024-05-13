@@ -8,13 +8,32 @@ public class User {
     private String userName;
     private Timestamp createdTimestamp;
 
+    private String userId;
+    private String fcmToken;
     public User() {
     }
 
-    public User(String phone, String userName, Timestamp createdTimestamp) {
+    public User(String phone, String userName, Timestamp createdTimestamp, String userId) {
         this.phone = phone;
         this.userName = userName;
         this.createdTimestamp = createdTimestamp;
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 
     public String getPhone() {
