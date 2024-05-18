@@ -26,7 +26,6 @@ public class ChatFragment extends Fragment {
     RecentChatRecyclerAdapter adapter;
 
     public ChatFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -36,12 +35,12 @@ public class ChatFragment extends Fragment {
          View view =  inflater.inflate(R.layout.fragment_chat, container, false);
          recyclerView = view.findViewById(R.id.recycler_view);
 
-         setUpRecyclerView();
+        setupRecyclerView();
         return view;
     }
 
 
-    void setUpRecyclerView(){
+    void setupRecyclerView(){
 
         Query query = FirebaseUtil.allChatroomCollectionReference()
                 .whereArrayContains("userIds",FirebaseUtil.currentUserId())

@@ -2,6 +2,7 @@ package com.example.mychat;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -42,9 +43,11 @@ public class ChatActivity extends AppCompatActivity {
     String chatRoomId;
     ChatRecyclerAdapter adapter;
     EditText messageInput;
-    ImageButton sendMessageBtn,backBtn;
+    ImageButton sendMessageBtn, backBtn;
     TextView otherUserName;
     RecyclerView recyclerView;
+
+    ImageView imageViewPic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,22 +56,31 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         otherUser = AndroidUtil.getUserModelFromIntent(getIntent());
-        chatRoomId = FirebaseUtil.getChatRoomId(FirebaseUtil.currentUserId(),otherUser.getUserId());
+        chatRoomId = FirebaseUtil.getChatRoomId(FirebaseUtil.currentUserId(), otherUser.getUserId());
         messageInput = findViewById(R.id.chat_message_input);
         sendMessageBtn = findViewById(R.id.message_send_btn);
         backBtn = findViewById(R.id.back_btn);
         otherUserName = findViewById(R.id.other_username);
         recyclerView = findViewById(R.id.chat_RecyclerView);
+        imageViewPic = findViewById(R.id.profile_pic_image_view);
 
-        backBtn.setOnClickListener((v)->{
+        FirebaseUtil.getOtherProfilePicStorageRef(otherUser.getUserId()).getDownloadUrl()
+                .addOnCompleteListener(t -> {
+                    if (t.isSuccessful()) {
+                        Uri uri = t.getResult();
+                        AndroidUtil.setProfilePic(this, uri, imageViewPic);
+                    }
+                });
+
+        backBtn.setOnClickListener((v) -> {
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
         });
 
         otherUserName.setText(otherUser.getUserName());
 
-        sendMessageBtn.setOnClickListener(v->{
+        sendMessageBtn.setOnClickListener(v -> {
             String message = messageInput.getText().toString().trim();
-            if(message.isEmpty()){
+            if (message.isEmpty()) {
                 return;
             }
             sendMessageToUser(message);
@@ -77,14 +89,14 @@ public class ChatActivity extends AppCompatActivity {
         setUpChatRecyclerView();
     }
 
-    void setUpChatRecyclerView(){
+    void setUpChatRecyclerView() {
         Query query = FirebaseUtil.getChatRoomMessageReference(chatRoomId)
-                .orderBy("timestamp",Query.Direction.DESCENDING);
+                .orderBy("timestamp", Query.Direction.DESCENDING);
 
         FirestoreRecyclerOptions<ChatMessage> options = new FirestoreRecyclerOptions.Builder<ChatMessage>()
-                .setQuery(query,ChatMessage.class).build();
+                .setQuery(query, ChatMessage.class).build();
 
-        adapter = new ChatRecyclerAdapter(options,getApplicationContext());
+        adapter = new ChatRecyclerAdapter(options, getApplicationContext());
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setReverseLayout(true);
         recyclerView.setLayoutManager(manager);
@@ -101,32 +113,33 @@ public class ChatActivity extends AppCompatActivity {
         });
 
     }
-    void sendMessageToUser(String message){
+
+    void sendMessageToUser(String message) {
         chatRoom.setLastMessageSenderId(FirebaseUtil.currentUserId());
         chatRoom.setLastMessageTimestamp(Timestamp.now());
         chatRoom.setLastMessage(message);
         FirebaseUtil.getChatroomReference(chatRoomId).set(chatRoom);
-        ChatMessage chatMessage = new ChatMessage(message,FirebaseUtil.currentUserId(),Timestamp.now());
+        ChatMessage chatMessage = new ChatMessage(message, FirebaseUtil.currentUserId(), Timestamp.now());
 
         FirebaseUtil.getChatRoomMessageReference(chatRoomId).add(chatMessage)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             messageInput.setText("");
                         }
                     }
                 });
     }
 
-    void  getOnCreateChatRoomModel(){
+    void getOnCreateChatRoomModel() {
         FirebaseUtil.getChatroomReference(chatRoomId).get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
+            if (task.isSuccessful()) {
                 chatRoom = task.getResult().toObject(ChatRoom.class);
-                if(chatRoom == null){
+                if (chatRoom == null) {
                     chatRoom = new ChatRoom(
                             chatRoomId,
-                            Arrays.asList(FirebaseUtil.currentUserId(),otherUser.getUserId()),
+                            Arrays.asList(FirebaseUtil.currentUserId(), otherUser.getUserId()),
                             Timestamp.now(),
                             ""
                     );
@@ -135,4 +148,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }
