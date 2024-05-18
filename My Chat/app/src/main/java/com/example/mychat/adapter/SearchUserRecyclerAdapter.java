@@ -3,6 +3,7 @@ package com.example.mychat.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,14 @@ public class SearchUserRecyclerAdapter extends FirestoreRecyclerAdapter<User, Se
         if(user.getUserId().equals(FirebaseUtil.currentUserId())){
             userModelViewHolder.usernameText.setText(user.getUserName() + "(Me)");
         }
+        FirebaseUtil.getOtherProfilePicStorageRef(user.getUserId()).getDownloadUrl()
+                .addOnCompleteListener(t -> {
+                    if(t.isSuccessful()){
+                        Uri uri = t.getResult();
+                        AndroidUtil.setProfilePic(context,uri,userModelViewHolder.profilePic);
+                    }
+                });
+
         userModelViewHolder.itemView.setOnClickListener(v->{
             Intent intent = new Intent(context, ChatActivity.class);
             AndroidUtil.passUserModelAsIntent(intent,user);

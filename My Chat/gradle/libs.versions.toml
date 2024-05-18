@@ -9,6 +9,7 @@ activity = "1.9.0"
 constraintlayout = "2.1.4"
 googleServices = "4.4.1"
 firebaseFirestore = "25.0.0"
+firebaseStorage = "21.0.0"
 
 
 
@@ -26,6 +27,9 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version = "33.0.0" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebaseui = {group = "com.firebaseui", name = "firebase-ui-firestore",version = "8.0.2"}
+imagepicker = {group = "com.github.dhaval2404",name = "imagepicker",version = "2.1"}
+glide = {group = "com.github.bumptech.glide",name = "glide",version = "4.16.0"}
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -74,6 +74,6 @@ public class ChatFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if(adapter!=null)
-            adapter.startListening();
+            adapter.notifyDataSetChanged();
     }
 }
