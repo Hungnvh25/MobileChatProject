@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -33,21 +35,35 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ChatActivity extends AppCompatActivity {
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
+public class ChatActivity extends AppCompatActivity {
+    private static final int PICK_IMAGE_VIDEO_REQUEST = 1;
+    private static final int PICK_FILE_REQUEST = 2;
     User otherUser;
     ChatRoom chatRoom;
     String chatRoomId;
     ChatRecyclerAdapter adapter;
     EditText messageInput;
-    ImageButton sendMessageBtn, backBtn;
+    ImageButton sendMessageBtn, backBtn,showImageBtn,buttonCamera,buttonFile;
     TextView otherUserName;
     RecyclerView recyclerView;
-
     ImageView imageViewPic;
+
+    LinearLayout hiddenButtons;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +79,43 @@ public class ChatActivity extends AppCompatActivity {
         otherUserName = findViewById(R.id.other_username);
         recyclerView = findViewById(R.id.chat_RecyclerView);
         imageViewPic = findViewById(R.id.profile_pic_image_view);
+
+
+
+        showImageBtn = findViewById(R.id.show_image);
+        hiddenButtons = findViewById(R.id.hidden_buttons);
+        buttonCamera = findViewById(R.id.button_camera);
+        buttonFile = findViewById(R.id.button_file);
+
+
+        showImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (hiddenButtons.getVisibility() == View.GONE) {
+                    hiddenButtons.setVisibility(View.VISIBLE);
+                    showImageBtn.setVisibility(View.GONE);
+                } else {
+                    hiddenButtons.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        messageInput.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (showImageBtn.getVisibility() == View.GONE) {
+                    showImageBtn.setVisibility(View.VISIBLE);
+                    hiddenButtons.setVisibility(View.GONE);
+                } else {
+                    hiddenButtons.setVisibility(View.GONE);
+                }
+            }
+        });
+
+
+        buttonCamera.setOnClickListener(v -> openFileChooser(PICK_IMAGE_VIDEO_REQUEST));
+        buttonFile.setOnClickListener(v -> openFileChooser(PICK_FILE_REQUEST));
+
 
         FirebaseUtil.getOtherProfilePicStorageRef(otherUser.getUserId()).getDownloadUrl()
                 .addOnCompleteListener(t -> {
@@ -127,6 +180,7 @@ public class ChatActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<DocumentReference> task) {
                         if (task.isSuccessful()) {
                             messageInput.setText("");
+                            sendNotification(message);
                         }
                     }
                 });
@@ -149,5 +203,74 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
+    void sendNotification(String message){
+
+        FirebaseUtil.currentUserDetails().get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                User currentUser = task.getResult().toObject(User.class);
+                try{
+                    JSONObject jsonObject  = new JSONObject();
+
+                    JSONObject notificationObj = new JSONObject();
+                    notificationObj.put("title",currentUser.getUserName());
+                    notificationObj.put("body",message);
+
+                    JSONObject dataObj = new JSONObject();
+                    dataObj.put("userId",currentUser.getUserId());
+
+                    jsonObject.put("notification",notificationObj);
+                    jsonObject.put("data",dataObj);
+                    jsonObject.put("to",otherUser.getFcmToken());
+
+                    callApi(jsonObject);
+
+
+                }catch (Exception e){
+
+                }
+
+            }
+        });
+
+    }
+
+    void callApi(JSONObject jsonObject){
+        MediaType JSON = MediaType.get("application/json; charset=utf-8");
+        OkHttpClient client = new OkHttpClient();
+        String url = "https://fcm.googleapis.com/fcm/send";
+        RequestBody body = RequestBody.create(jsonObject.toString(),JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .header("Authorization","Bearer AAAAWupq0IU:APA91bF3VtCO6Ky6P8BlYFs0xu9nd7PfLoLCN_JB5mSVhm5dPBFq1b4FQvM_5gdcfN73QwOyHB1PD-_3-JxQaBDugFkSYoZny7e0i4FWVnD9w--vlJh2phaXpUcNPsUwI1bCRLSOuMpy")
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
+            }
+        });
+
+    }
+
+    void openFileChooser(int requestCode) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        if (requestCode == PICK_IMAGE_VIDEO_REQUEST) {
+            intent.setType("*/*");
+            String[] mimeTypes = {"image/*", "video/*"};
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+        } else if (requestCode == PICK_FILE_REQUEST) {
+            intent.setType("*/*");
+        }
+
+        startActivityForResult(Intent.createChooser(intent, "Select File"), requestCode);
+    }
 
 }

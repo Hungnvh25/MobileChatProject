@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -42,6 +43,7 @@ public class LoginUserNameActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.login_progress_bar);
         phoneNumber = getIntent().getExtras().getString("phone");
 
+
         getUserName();
 
         letMeInBtn.setOnClickListener((v -> {
@@ -60,6 +62,7 @@ public class LoginUserNameActivity extends AppCompatActivity {
         setInProgress(true);
         if(user!=null){
             user.setUserName(userName);
+            user.setPhone(phoneNumber);
         }else {
             user = new User(phoneNumber,userName, Timestamp.now(),FirebaseUtil.currentUserId());
         }
