@@ -59,11 +59,10 @@ public class SearchUserActivity extends AppCompatActivity {
                     .whereLessThanOrEqualTo("phone",searchTerm+'\uf8ff');
         }
         else {
-             query = FirebaseUtil.allUserCollectionReference()
+            query = FirebaseUtil.allUserCollectionReference()
                     .whereGreaterThanOrEqualTo("userName",searchTerm)
                     .whereLessThanOrEqualTo("userName",searchTerm+'\uf8ff');
         }
-
 
         FirestoreRecyclerOptions<User> options = new FirestoreRecyclerOptions.Builder<User>()
                 .setQuery(query,User.class).build();

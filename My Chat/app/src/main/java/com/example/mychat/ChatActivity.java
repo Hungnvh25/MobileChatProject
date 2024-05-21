@@ -1,18 +1,23 @@
 package com.example.mychat;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.MimeTypeMap;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -34,6 +39,8 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.json.JSONObject;
 
@@ -52,6 +59,7 @@ import okhttp3.Response;
 public class ChatActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_VIDEO_REQUEST = 1;
     private static final int PICK_FILE_REQUEST = 2;
+
     User otherUser;
     ChatRoom chatRoom;
     String chatRoomId;
@@ -62,14 +70,17 @@ public class ChatActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     ImageView imageViewPic;
 
-    LinearLayout hiddenButtons;
+     LinearLayout hiddenButtons;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chat);
+
+        otherUser = AndroidUtil.getUserModelFromIntent(getIntent());
+        chatRoomId = FirebaseUtil.getChatRoomId(FirebaseUtil.currentUserId(), otherUser.getUserId());
+
 
         messageInput = findViewById(R.id.chat_message_input);
         sendMessageBtn = findViewById(R.id.message_send_btn);
@@ -82,9 +93,6 @@ public class ChatActivity extends AppCompatActivity {
         hiddenButtons = findViewById(R.id.hidden_buttons);
         buttonCamera = findViewById(R.id.button_camera);
         buttonFile = findViewById(R.id.button_file);
-
-        otherUser = AndroidUtil.getUserModelFromIntent(getIntent());
-        chatRoomId = FirebaseUtil.getChatRoomId(FirebaseUtil.currentUserId(), otherUser.getUserId());
 
         showImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,10 +118,8 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-
         buttonCamera.setOnClickListener(v -> openFileChooser(PICK_IMAGE_VIDEO_REQUEST));
         buttonFile.setOnClickListener(v -> openFileChooser(PICK_FILE_REQUEST));
-
 
         FirebaseUtil.getOtherProfilePicStorageRef(otherUser.getUserId()).getDownloadUrl()
                 .addOnCompleteListener(t -> {
@@ -131,14 +137,16 @@ public class ChatActivity extends AppCompatActivity {
 
         sendMessageBtn.setOnClickListener(v -> {
             String message = messageInput.getText().toString().trim();
-            if (message.isEmpty()) {
-                return;
+
+            if (!message.isEmpty()) {
+                sendMessageToUser(message,"text");
             }
-            sendMessageToUser(message);
         });
+
         getOnCreateChatRoomModel();
         setUpChatRecyclerView();
     }
+
 
     void setUpChatRecyclerView() {
         Query query = FirebaseUtil.getChatRoomMessageReference(chatRoomId)
@@ -165,12 +173,13 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    void sendMessageToUser(String message) {
+    void sendMessageToUser(String message, String type) {
         chatRoom.setLastMessageSenderId(FirebaseUtil.currentUserId());
         chatRoom.setLastMessageTimestamp(Timestamp.now());
-        chatRoom.setLastMessage(message);
+        chatRoom.setLastMessage(type.equals("image") ? "Sent an image" : (type.equals("video") ? "Sent a video" : message));
+
         FirebaseUtil.getChatroomReference(chatRoomId).set(chatRoom);
-        ChatMessage chatMessage = new ChatMessage(message, FirebaseUtil.currentUserId(), Timestamp.now());
+        ChatMessage chatMessage = new ChatMessage(message, FirebaseUtil.currentUserId(), Timestamp.now(),type);
 
         FirebaseUtil.getChatRoomMessageReference(chatRoomId).add(chatMessage)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
@@ -178,7 +187,7 @@ public class ChatActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<DocumentReference> task) {
                         if (task.isSuccessful()) {
                             messageInput.setText("");
-                            sendNotification(message);
+                            sendNotification(message,type);
                         }
                     }
                 });
@@ -201,7 +210,7 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    void sendNotification(String message){
+    void sendNotification(String message, String type){
 
         FirebaseUtil.currentUserDetails().get().addOnCompleteListener(task -> {
             if(task.isSuccessful()){
@@ -211,7 +220,7 @@ public class ChatActivity extends AppCompatActivity {
 
                     JSONObject notificationObj = new JSONObject();
                     notificationObj.put("title",currentUser.getUserName());
-                    notificationObj.put("body",message);
+                    notificationObj.put("body",type.equals("image") ? "Sent an image" : (type.equals("video") ? "Sent a video" : message));
 
                     JSONObject dataObj = new JSONObject();
                     dataObj.put("userId",currentUser.getUserId());
@@ -271,4 +280,44 @@ public class ChatActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Select File"), requestCode);
     }
 
+    private void uploadFileToFirebaseStorage(Uri fileUri, String fileType) {
+        if (fileUri != null) {
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("chat_files/" + System.currentTimeMillis() + "." + getFileExtension(fileUri));
+
+            storageReference.putFile(fileUri).addOnSuccessListener(taskSnapshot -> {
+                storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                    String fileUrl = uri.toString();
+                    sendMessageToUser(fileUrl, fileType);
+                });
+            }).addOnFailureListener(e -> {
+                Toast.makeText(ChatActivity.this, "Failed to upload file: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        }
+    }
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri fileUri = data.getData();
+            if (requestCode == PICK_IMAGE_VIDEO_REQUEST) {
+                String mimeType = getContentResolver().getType(fileUri);
+                if (mimeType.startsWith("image/")) {
+                    uploadFileToFirebaseStorage(fileUri, "image");
+                } else if (mimeType.startsWith("video/")) {
+                    uploadFileToFirebaseStorage(fileUri, "video");
+                }
+            } else if (requestCode == PICK_FILE_REQUEST) {
+                uploadFileToFirebaseStorage(fileUri, "file");
+            }
+        }
+
+    }
 }

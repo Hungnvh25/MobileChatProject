@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/edit_text_rounded_corner"
             android:layout_margin="10dp"
-            android:hint="Username or phone"
+            android:hint="Username"
             android:padding="10dp"
             android:elevation="4dp"
             android:layout_toLeftOf="@+id/search_user_btn"/>

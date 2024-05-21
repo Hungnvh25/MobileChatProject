@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -42,7 +41,6 @@ public class LoginUserNameActivity extends AppCompatActivity {
         letMeInBtn = findViewById(R.id.login_letMeIn_btn);
         progressBar = findViewById(R.id.login_progress_bar);
         phoneNumber = getIntent().getExtras().getString("phone");
-
 
         getUserName();
 

@@ -5,38 +5,141 @@
     android:padding="8dp">
 
     <LinearLayout
-        android:id="@+id/left_chat_layout"
-        android:layout_width="wrap_content"
+        android:id="@+id/all_chat_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/chat_color_sender"
-        android:padding="8dp"
-        android:layout_marginEnd="80dp"
-        android:background="@drawable/edit_text_rounded_corner">
-        <TextView
-            android:id="@+id/left_chat_textview"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/left_chat_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hello how are you?"
-            android:textColor="@color/white"
-            android:textSize="18sp"/>
+            android:backgroundTint="@color/chat_color_sender"
+            android:padding="8dp"
+            android:layout_marginEnd="80dp"
+            android:background="@drawable/edit_text_rounded_corner">
+            <TextView
+                android:id="@+id/left_chat_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hello how are you?"
+                android:textColor="@color/white"
+                android:textSize="18sp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/right_chat_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/chat_color_receiver"
+            android:padding="8dp"
+            android:layout_marginStart="80dp"
+            android:layout_gravity="end"
+            android:background="@drawable/edit_text_rounded_corner">
+            <TextView
+                android:id="@+id/right_chat_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="I am fine."
+                android:textColor="@color/white"
+                android:textSize="18sp"/>
+        </LinearLayout>
+
+
     </LinearLayout>
+
     <LinearLayout
-        android:id="@+id/right_chat_layout"
-        android:layout_below="@+id/left_chat_layout"
-        android:layout_width="wrap_content"
+        android:id="@+id/all_image_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/chat_color_receiver"
-        android:padding="8dp"
-        android:layout_marginStart="80dp"
-        android:layout_alignParentEnd="true"
-        android:background="@drawable/edit_text_rounded_corner">
-        <TextView
-            android:id="@+id/right_chat_textview"
+        android:orientation="vertical"
+        android:layout_below="@+id/all_chat_layout">
+        <LinearLayout
+
+            android:id="@+id/left_image_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="I am fine."
-            android:textColor="@color/white"
-            android:textSize="18sp"/>
+            android:layout_marginEnd="80dp"
+
+            >
+            <ImageView
+                android:id="@+id/left_chat_image"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
+                android:src="@drawable/test_image"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/right_image_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end">
+
+            <ImageView
+                android:id="@+id/right_chat_image"
+                android:layout_width="130dp"
+                android:layout_height="130dp"
+                android:src="@drawable/test_image"
+                />
+        </LinearLayout>
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/all_video_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/all_image_layout">
+
+        <LinearLayout
+            android:id="@+id/left_video_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="80dp">
+
+            <FrameLayout
+                android:layout_width="130dp"
+                android:layout_height="130dp">
+
+                <VideoView
+                    android:id="@+id/left_chat_video"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:visibility="gone"/>
+
+                <ImageView
+                    android:id="@+id/left_chat_video_thumbnail"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:scaleType="centerCrop"/>
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/right_video_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end">
+
+            <FrameLayout
+                android:layout_width="130dp"
+                android:layout_height="130dp">
+
+                <VideoView
+                    android:id="@+id/right_chat_video"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:visibility="gone"/>
+
+                <ImageView
+                    android:id="@+id/right_chat_video_thumbnail"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:scaleType="centerCrop"/>
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+
+
 
 </RelativeLayout>

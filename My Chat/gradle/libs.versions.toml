@@ -32,8 +32,8 @@ glide = {group = "com.github.bumptech.glide",name = "glide",version = "4.16.0"}
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version = "4.12.0" }
-
 libphonenumber= { group = "com.googlecode.libphonenumber", name = "libphonenumber", version = "8.12.30" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 
