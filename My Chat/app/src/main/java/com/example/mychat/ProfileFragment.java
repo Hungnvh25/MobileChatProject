@@ -27,6 +27,7 @@ import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.UploadTask;
 
 import kotlin.Unit;
@@ -84,10 +85,15 @@ public class ProfileFragment extends Fragment {
         }));
 
         logoutBtn.setOnClickListener((v -> {
-            FirebaseUtil.logout();
-            Intent intent = new Intent(getContext(), SplashActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+            FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener(task -> {
+                if (task.isSuccessful()){
+                    FirebaseUtil.logout();
+                    Intent intent = new Intent(getContext(), SplashActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+            });
+
         }));
 
         profilePic.setOnClickListener((v->{

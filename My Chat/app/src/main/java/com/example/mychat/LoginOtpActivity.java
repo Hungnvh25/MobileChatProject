@@ -11,7 +11,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.mychat.utils.AndroidUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -127,7 +126,9 @@ public class LoginOtpActivity extends AppCompatActivity {
                 setInProgress(false);
                 if (task.isSuccessful()) {
                     Intent intent = new Intent(LoginOtpActivity.this, LoginUserNameActivity.class);
-                    intent.putExtra("phone", phoneNumber);
+                    String cleanedPhoneNumber = AndroidUtil.formatPhoneNumber(phoneNumber, "VN");
+                    intent.putExtra("phone", cleanedPhoneNumber);
+
                     startActivity(intent);
                 } else {
                     AndroidUtil.showToast(getApplicationContext(), "OTP verification failed");
